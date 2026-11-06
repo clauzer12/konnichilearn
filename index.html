@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KonnichiLearn - Belajar Bahasa Jepang (Hiragana, Katakana, Kanji)</title>
+  <!-- Tailwind CSS Engine -->
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ==============================================
+       NAVBAR / HEADER APLIKASI
+  =============================================== -->
+  <header class="border-b border-[var(--border)] bg-[var(--card)] sticky top-0 z-30 px-4 py-3 shadow-sm">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 cursor-pointer select-none" onclick="appState.showHomeView()">
+        <div class="w-10 h-10 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/30 flex items-center justify-center font-black text-2xl shadow-sm">
+          あ
+        </div>
+        <div>
+          <h1 class="font-black text-lg md:text-xl tracking-tight leading-none flex items-center gap-2">
+            KonnichiLearn
+          </h1>
+          <p class="text-xs text-[var(--muted-foreground)] mt-0.5">Aplikasi Belajar Kana, Kanji & Kalimat Harian</p>
+        </div>
+      </div>
+
+      <!-- Quick Stats & Settings -->
+      <div class="flex items-center gap-3 text-xs">
+        <!-- Audio Speed Control -->
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--content)] border border-[var(--border)] font-semibold">
+          <span>🔊</span>
+          <select onchange="audioPlayer.setSpeed(parseFloat(this.value))" class="bg-transparent border-0 text-xs font-bold text-[var(--foreground)] focus:ring-0 cursor-pointer">
+            <option value="0.75">Lambat (0.75x)</option>
+            <option value="0.85" selected>Normal (0.85x)</option>
+            <option value="1.0">Cepat (1.0x)</option>
+          </select>
+        </div>
+
+        <!-- Streak -->
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--content)] border border-[var(--border)]">
+          <span>🔥</span>
+          <span class="font-black text-orange-500" id="user-streak-val">3 Hari</span>
+        </div>
+
+        <!-- Points -->
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--content)] border border-[var(--border)]">
+          <span>⭐</span>
+          <span class="font-black text-amber-500" id="user-points-val">120 Poin</span>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==============================================
+       VIEW 1: HALAMAN UTAMA (HOME / DASHBOARD)
+  =============================================== -->
+  <main id="view-home" class="max-w-6xl mx-auto p-4 md:p-8 w-full flex-1 space-y-8 block">
+    
+    <!-- Hero Banner -->
+    <div class="relative overflow-hidden bg-gradient-to-br from-red-500/15 via-rose-500/10 to-transparent border border-red-500/20 p-6 md:p-10 rounded-3xl space-y-3 shadow-sm">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-red-500 text-white shadow-sm">
+        <span>🗾</span> Belajar Bahasa Jepang Mandiri
+      </div>
+      <h2 class="text-2xl md:text-4xl font-black text-[var(--foreground)] tracking-tight">
+        Mau Belajar Apa Hari Ini?
+      </h2>
+      <p class="text-xs md:text-sm text-[var(--muted-foreground)] max-w-xl leading-relaxed">
+        Pilih salah satu sistem huruf di bawah untuk memulai. Setiap modul dilengkapi tabel karakter lengkap, kanvas menulis bergaris bantu, kalimat percakapan nyata, modul pembanding huruf mirip, dan latihan soal interaktif.
+      </p>
+    </div>
+
+    <!-- 3 KARTU PILIHAN UTAMA: HIRAGANA, KATAKANA, KANJI -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- Card 1: Hiragana -->
+      <div onclick="appState.openCategory('hiragana')" class="group cursor-pointer bg-[var(--card)] hover:border-red-500/60 p-7 rounded-3xl border border-[var(--border)] shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between space-y-6">
+        <div class="space-y-4">
+          <div class="w-16 h-16 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center text-4xl font-black group-hover:scale-110 transition-transform">
+            あ
+          </div>
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-2xl font-black group-hover:text-red-500 transition">Hiragana</h3>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-500 font-bold">46 Huruf</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] mt-2 leading-relaxed">
+              Huruf dasar dengan lekukan melengkung halus. Digunakan untuk kosakata asli Jepang dan partikel tata bahasa (*wa, o, ni, de*).
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-[var(--border)] flex items-center justify-between text-xs font-bold text-red-500">
+          <span>Buka Modul Hiragana</span>
+          <span class="group-hover:translate-x-1.5 transition-transform text-sm">➔</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Katakana -->
+      <div onclick="appState.openCategory('katakana')" class="group cursor-pointer bg-[var(--card)] hover:border-blue-500/60 p-7 rounded-3xl border border-[var(--border)] shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between space-y-6">
+        <div class="space-y-4">
+          <div class="w-16 h-16 rounded-2xl bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center justify-center text-4xl font-black group-hover:scale-110 transition-transform">
+            ア
+          </div>
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-2xl font-black group-hover:text-blue-500 transition">Katakana</h3>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-500 font-bold">46 Huruf</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] mt-2 leading-relaxed">
+              Huruf bersudut tegas dan kaku. Khusus digunakan untuk kata serapan bahasa asing (*Koohii, Kamera*), nama negara, dan onomatope.
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-[var(--border)] flex items-center justify-between text-xs font-bold text-blue-500">
+          <span>Buka Modul Katakana</span>
+          <span class="group-hover:translate-x-1.5 transition-transform text-sm">➔</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Kanji -->
+      <div onclick="appState.openCategory('kanji')" class="group cursor-pointer bg-[var(--card)] hover:border-emerald-500/60 p-7 rounded-3xl border border-[var(--border)] shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between space-y-6">
+        <div class="space-y-4">
+          <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center text-4xl font-black group-hover:scale-110 transition-transform">
+            日
+          </div>
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-2xl font-black group-hover:text-emerald-500 transition">Kanji</h3>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 font-bold">Tingkat N5</span>
+            </div>
+            <p class="text-xs text-[var(--muted-foreground)] mt-2 leading-relaxed">
+              Karakter logografik yang mewakili makna ide. Pelajari kanji dasar esensial (hari, alam, angka, manusia) beserta cara baca dan goresannya.
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-[var(--border)] flex items-center justify-between text-xs font-bold text-emerald-500">
+          <span>Buka Modul Kanji Dasar</span>
+          <span class="group-hover:translate-x-1.5 transition-transform text-sm">➔</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tips Singkat Belajar -->
+    <div class="bg-[var(--card)] p-6 rounded-3xl border border-[var(--border)] space-y-3">
+      <h4 class="font-bold text-sm flex items-center gap-2">
+        <span>💡</span> Tips Efektif Belajar Bahasa Jepang:
+      </h4>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-[var(--muted-foreground)]">
+        <div class="p-4 rounded-2xl bg-[var(--content)] border border-[var(--border)] space-y-1">
+          <strong class="text-[var(--foreground)] block">1. Kuasai Hiragana Dahulu</strong>
+          Hiragana adalah pondasi paling penting. Setelah lancar membaca Hiragana, belajar Katakana dan Kanji akan terasa jauh lebih mudah.
+        </div>
+        <div class="p-4 rounded-2xl bg-[var(--content)] border border-[var(--border)] space-y-1">
+          <strong class="text-[var(--foreground)] block">2. Tulis Sambil Ucapkan Suaranya</strong>
+          Gunakan kanvas latihan menulis sambil membunyikan hurufnya agar telinga dan tangan sinkron mengingat karakternya.
+        </div>
+        <div class="p-4 rounded-2xl bg-[var(--content)] border border-[var(--border)] space-y-1">
+          <strong class="text-[var(--foreground)] block">3. Uji Diri Sendiri Setiap Hari</strong>
+          Luangkan 5 menit untuk bermain kuis acak agar otak terlatih memanggil ingatan (*active recall*).
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==============================================
+       VIEW 2: HALAMAN MODUL KATEGORI TERPILIH
+  =============================================== -->
+  <div id="view-category" class="w-full flex-1 flex flex-col hidden">
+    
+    <!-- Sub-Navbar: Tombol Kembali & 4 Sub-Tabs -->
+    <div class="border-b border-[var(--border)] bg-[var(--card)] px-4 py-3 sticky top-[61px] z-20 shadow-sm">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        
+        <!-- Back Button & Breadcrumb -->
+        <div class="flex items-center gap-3">
+          <button onclick="appState.showHomeView()" class="px-3.5 py-2 rounded-xl border border-[var(--border)] bg-[var(--content)] hover:bg-[var(--card)] text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <span>←</span> Menu Utama
+          </button>
+          <div class="flex items-center gap-2">
+            <span id="category-badge" class="px-2.5 py-0.5 rounded-full text-xs font-black">HIRAGANA</span>
+            <span id="category-title-text" class="text-sm font-bold text-[var(--foreground)]">Hiragana (ひらがな)</span>
+          </div>
+        </div>
+
+        <!-- 4 SUB-TABS: TABEL HURUF, AWAS TERTUKAR, KALIMAT SEHARI-HARI, LATIHAN SOAL -->
+        <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+          <button onclick="appState.switchSubTab('table')" id="btn-subtab-table" class="cat-subtab-btn px-4 py-2 text-xs font-bold rounded-xl bg-red-500 text-white shadow-md transition flex items-center gap-2 whitespace-nowrap">
+            <span>🔤</span> Tabel & Latihan Tulis
+          </button>
+          <button onclick="appState.switchSubTab('confusing')" id="btn-subtab-confusing" class="cat-subtab-btn px-4 py-2 text-xs font-bold rounded-xl text-[var(--muted-foreground)] hover:bg-[var(--content)] transition flex items-center gap-2 whitespace-nowrap">
+            <span>⚠️</span> Awas Tertukar!
+          </button>
+          <button onclick="appState.switchSubTab('sentences')" id="btn-subtab-sentences" class="cat-subtab-btn px-4 py-2 text-xs font-bold rounded-xl text-[var(--muted-foreground)] hover:bg-[var(--content)] transition flex items-center gap-2 whitespace-nowrap">
+            <span>💬</span> Kalimat Sehari-hari
+          </button>
+          <button onclick="appState.switchSubTab('quiz')" id="btn-subtab-quiz" class="cat-subtab-btn px-4 py-2 text-xs font-bold rounded-xl text-[var(--muted-foreground)] hover:bg-[var(--content)] transition flex items-center gap-2 whitespace-nowrap">
+            <span>🎯</span> Latihan Soal (Kuis)
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Konten Sub-Modul Kategori -->
+    <main class="max-w-6xl mx-auto p-4 md:p-6 flex-1 w-full space-y-6">
+      
+      <!-- Deskripsi Singkat Kategori Aktif -->
+      <div class="bg-[var(--card)] p-4 rounded-2xl border border-[var(--border)] flex items-center justify-between">
+        <p class="text-xs text-[var(--muted-foreground)]" id="category-desc-text"></p>
+      </div>
+
+      <!-- ==============================================
+           SUB-TAB 1: TABEL HURUF & KANVAS MENULIS
+      =============================================== -->
+      <section id="subtab-table" class="subtab-panel block space-y-6">
+        
+        <!-- Filter Baris Huruf -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs" id="table-filter-pills">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Grid Karakter -->
+        <div id="characters-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Milestone Kosakata Nyata yang Sudah Bisa Dibaca (Metode Ryu Sensei) -->
+        <div id="row-milestone-box" class="hidden bg-gradient-to-r from-red-500/10 via-rose-500/5 to-transparent p-5 rounded-3xl border border-red-500/20 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🎉</span>
+              <h4 class="text-xs font-black uppercase tracking-wider text-red-500" id="milestone-title">
+                Kosakata Nyata yang Sudah Bisa Kamu Baca:
+              </h4>
+            </div>
+            <span class="text-[10px] text-[var(--muted-foreground)]">Ketuk kata untuk mendengar pelafalan asli</span>
+          </div>
+          <div class="flex flex-wrap gap-2.5" id="milestone-words-container">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Kanvas Interaktif Latihan Menulis -->
+        <div id="canvas-section" class="bg-[var(--card)] p-6 md:p-8 rounded-3xl border border-[var(--border)] shadow-sm space-y-6">
+          
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[var(--border)] pb-4">
+            <div>
+              <span class="text-xs font-black uppercase tracking-wider text-red-500">Praktek Tulis Tangan</span>
+              <h3 class="text-xl font-bold">Kanvas Kaligrafi Karakter</h3>
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer text-xs font-bold select-none">
+              <input type="checkbox" id="toggle-canvas-guide" checked onchange="appState.writingCanvas.toggleGuide(this.checked)" class="rounded text-red-500 focus:ring-0 cursor-pointer">
+              <span>Tampilkan Bayangan Panduan (*Tracing*)</span>
+            </label>
+          </div>
+
+          <!-- Panduan 3 Teknik Akhiran Goresan (Ryu Sensei Video 2) -->
+          <div class="flex flex-wrap items-center gap-2 bg-[var(--content)] p-3 rounded-2xl border border-[var(--border)] text-[11px]">
+            <span class="font-bold text-[var(--foreground)] mr-1">3 Akhiran Goresan:</span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/20">
+              🛑 <strong>Tome</strong> (Berhenti)
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20">
+              🪝 <strong>Hane</strong> (Kait)
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
+              🍃 <strong>Harai</strong> (Sapuan Lepas)
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            
+            <!-- Informasi Karakter & Langkah Goresan -->
+            <div class="md:col-span-5 space-y-4">
+              <div class="flex items-center gap-4 bg-[var(--content)] p-4 rounded-2xl border border-[var(--border)]">
+                <div class="w-20 h-20 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center text-5xl font-black" id="canvas-char-badge">
+                  あ
+                </div>
+                <div>
+                  <h4 class="text-lg font-black" id="canvas-romaji-title">A (a)</h4>
+                  <p class="text-xs font-bold text-emerald-500" id="canvas-strokes-info">3 Goresan</p>
+                  <p class="text-xs text-[var(--muted-foreground)] mt-1" id="canvas-example-info">Contoh: ありがとう</p>
+                  <button onclick="audioPlayer.play(document.getElementById('canvas-char-badge').textContent)" class="mt-2 text-xs text-red-500 font-bold hover:underline inline-flex items-center gap-1">
+                    🔊 Putar Suara Pelafalan
+                  </button>
+                </div>
+              </div>
+
+              <!-- Asosiasi Mnemonik Visual (Ryu Sensei Video 1) -->
+              <div id="canvas-mnemonic-box" class="p-3.5 rounded-2xl bg-[var(--content)] border border-[var(--border)] text-xs space-y-1">
+                <span class="text-[10px] uppercase font-black text-amber-500 flex items-center gap-1">
+                  <span>💡</span> Asosiasi Bentuk Gambar (Mnemonik):
+                </span>
+                <p class="text-[11px] text-[var(--foreground)] font-semibold leading-relaxed" id="canvas-mnemonic-text">
+                  Bentuk orang berperut buncit...
+                </p>
+              </div>
+
+              <!-- Tips Pelafalan Khusus Lidah Indonesia (Ryu Sensei Video 1) -->
+              <div id="canvas-pronunciation-box" class="hidden p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs space-y-1">
+                <span class="text-[10px] uppercase font-black text-red-500 flex items-center gap-1">
+                  <span>🇮🇩</span> Tips Pelafalan Khusus Lidah Indonesia:
+                </span>
+                <p class="text-[11px] text-[var(--foreground)] font-bold leading-relaxed" id="canvas-pronunciation-text">
+                  ...
+                </p>
+              </div>
+
+              <!-- List Urutan Goresan -->
+              <div class="space-y-2 text-xs text-[var(--muted-foreground)]">
+                <span class="font-bold text-[var(--foreground)] block">Urutan Goresan yang Benar (*Kakijun*):</span>
+                <ol id="canvas-steps-list" class="list-decimal list-inside space-y-2 leading-relaxed bg-[var(--content)] p-4 rounded-2xl border border-[var(--border)]">
+                  <!-- Rendered via JS -->
+                </ol>
+              </div>
+            </div>
+
+            <!-- Area Kanvas Gambar -->
+            <div class="md:col-span-7 flex flex-col items-center">
+              <div class="relative w-[320px] h-[320px] rounded-3xl border-2 border-dashed border-[var(--border)] overflow-hidden bg-[var(--content)] flex items-center justify-center kana-canvas-grid shadow-inner">
+                <!-- Bayangan Huruf Guide -->
+                <div id="canvas-guide-char" class="absolute select-none pointer-events-none text-gray-400/40 dark:text-gray-600/50 font-black text-[200px] leading-none transition-opacity duration-200">
+                  あ
+                </div>
+                <!-- Drawing Canvas -->
+                <canvas id="drawing-canvas" width="320" height="320" class="absolute top-0 left-0 w-full h-full cursor-crosshair touch-none"></canvas>
+              </div>
+
+              <!-- Canvas Action Controls -->
+              <div class="w-[320px] flex gap-2 mt-4">
+                <button onclick="appState.writingCanvas.undo()" class="px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--content)] hover:bg-[var(--card)] text-xs font-bold transition" title="Batalkan coretan terakhir">
+                  ↩️ Undo
+                </button>
+                <button onclick="appState.writingCanvas.clear()" class="flex-1 py-2 rounded-xl border border-[var(--border)] bg-[var(--content)] hover:bg-[var(--card)] text-xs font-bold transition">
+                  🗑️ Bersihkan
+                </button>
+                <button onclick="appState.writingCanvas.downloadImage()" class="px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--content)] hover:bg-[var(--card)] text-xs font-bold transition" title="Simpan sebagai gambar PNG">
+                  💾 Simpan
+                </button>
+                <button onclick="appState.writingCanvas.evaluate()" class="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-xs font-black transition shadow-sm">
+                  ✅ Cek Hasil
+                </button>
+              </div>
+              <p id="canvas-feedback" class="text-xs text-center mt-2 font-bold min-h-[1.25rem]"></p>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ==============================================
+             LEMBAR LATIHAN MENULIS BERULANG (DRILL SHEET)
+        =============================================== -->
+        <div id="drill-sheet-section" class="bg-[var(--card)] p-6 md:p-8 rounded-3xl border border-[var(--border)] shadow-sm space-y-6">
+          
+          <!-- Header Drill Sheet -->
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
+            <div>
+              <span class="text-xs font-black uppercase tracking-wider text-red-500">Metode Renchou (Buku Latihan Jepang)</span>
+              <h3 class="text-xl font-bold flex items-center gap-2">
+                📝 Lembar Latihan Menulis Berulang
+              </h3>
+              <p class="text-xs text-[var(--muted-foreground)] mt-0.5">
+                Latih memori otot tangan dengan menulis karakter yang sama beberapa kali secara bertahap.
+              </p>
+            </div>
+
+            <!-- Karakter Target Aktif -->
+            <div class="flex items-center gap-3 bg-[var(--content)] px-4 py-2 rounded-2xl border border-[var(--border)]">
+              <span class="text-2xl font-black text-red-500" id="drill-target-badge">あ</span>
+              <div class="text-xs">
+                <span class="font-bold text-[var(--foreground)] block" id="drill-target-info">A (a) • 3 Goresan</span>
+                <span class="text-[var(--muted-foreground)] text-[10px]">Huruf yang sedang dilatih</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Petunjuk Tahapan Belajar (Legend) & Pilihan Jumlah Kotak -->
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-[var(--content)] p-4 rounded-2xl border border-[var(--border)] text-xs">
+            <!-- Tahapan Scaffolding -->
+            <div class="flex flex-wrap items-center gap-3 text-[11px] font-semibold">
+              <span class="text-[var(--foreground)] font-bold">Tahapan:</span>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span>🟩</span> Kotak 1: Jiplak (100%)
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                <span>🟨</span> Kotak 2-3: Samar (40%)
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                <span>🟦</span> Kotak 4+: Mandiri (0%)
+              </span>
+            </div>
+
+            <!-- Selector Jumlah Kotak -->
+            <div class="flex items-center gap-1.5 self-end md:self-auto">
+              <span class="text-[var(--muted-foreground)] font-bold mr-1">Jumlah:</span>
+              <button onclick="drillSheet.setCount(3)" data-count="3" class="drill-count-btn px-3 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-red-500 font-bold transition">
+                3x
+              </button>
+              <button onclick="drillSheet.setCount(5)" data-count="5" class="drill-count-btn px-3 py-1.5 rounded-xl bg-red-500 text-white font-bold transition shadow-sm">
+                5x (Rekomendasi)
+              </button>
+              <button onclick="drillSheet.setCount(10)" data-count="10" class="drill-count-btn px-3 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-red-500 font-bold transition">
+                10x
+              </button>
+            </div>
+          </div>
+
+          <!-- Grid Wadah Kotak-Kotak Kanvas -->
+          <div id="drill-sheet-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <!-- Rendered via drill.js -->
+          </div>
+
+          <!-- Bottom Action Controls -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[var(--border)] pt-4">
+            <button onclick="drillSheet.clearAll()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--content)] hover:bg-[var(--card)] text-xs font-bold transition flex items-center justify-center gap-1.5">
+              🗑️ Bersihkan Semua Kotak
+            </button>
+            <button onclick="drillSheet.evaluateSheet()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-xs font-black transition shadow-sm flex items-center justify-center gap-2">
+              ⭐ Selesaikan & Cek 1 Lembar (+25 Poin)
+            </button>
+          </div>
+
+          <!-- Feedback Box -->
+          <div id="drill-feedback-box" class="hidden p-4 rounded-2xl text-xs font-medium text-center space-y-2">
+            <div id="drill-feedback-text"></div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ==============================================
+           SUB-TAB: AWAS TERTUKAR (CONFUSING CHARACTERS)
+      =============================================== -->
+      <section id="subtab-confusing" class="subtab-panel hidden space-y-6">
+        <div class="bg-[var(--card)] p-5 md:p-6 rounded-2xl border border-[var(--border)]">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-red-500/15 text-red-500">
+              Panduan Visual
+            </span>
+          </div>
+          <h3 class="text-lg font-black mt-1 text-[var(--foreground)]">Modul "Awas Tertukar!" (紛らわしい文字)</h3>
+          <p class="text-xs text-[var(--muted-foreground)] mt-0.5">
+            Panduan membedakan karakter yang memiliki bentuk sangat mirip, lengkap dengan kunci pembeda visual, trik mnemonic, dan mini kuis uji ketelitian.
+          </p>
+        </div>
+
+        <div class="space-y-6" id="confusing-cards-container">
+          <!-- Rendered via confusing.js -->
+        </div>
+      </section>
+
+      <!-- ==============================================
+           SUB-TAB 2: KALIMAT SEHARI-HARI
+      =============================================== -->
+      <section id="subtab-sentences" class="subtab-panel hidden space-y-6">
+        <div class="bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)]">
+          <h3 class="text-base font-bold">Percakapan Sehari-hari (日常会話)</h3>
+          <p class="text-xs text-[var(--muted-foreground)]">Kumpulan kalimat percakapan nyata yang sering dijumpai di Jepang, lengkap dengan pembedahan kata dan partikel.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="sentences-list-container">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- ==============================================
+           SUB-TAB 3: LATIHAN SOAL (KUIS DINAMIS)
+      =============================================== -->
+      <section id="subtab-quiz" class="subtab-panel hidden space-y-6">
+        
+        <!-- Quiz Mode Selector -->
+        <div class="flex gap-2 justify-center flex-wrap">
+          <button id="btn-quiz-choice" onclick="quizEngine.setMode('choice')" class="quiz-mode-pill px-4 py-2 rounded-xl text-xs font-bold bg-red-500 text-white transition shadow-sm">
+            🎯 Pilihan Ganda
+          </button>
+          <button id="btn-quiz-audio" onclick="quizEngine.setMode('audio')" class="quiz-mode-pill px-4 py-2 rounded-xl text-xs font-bold bg-[var(--card)] border border-[var(--border)] hover:border-red-500 transition shadow-sm">
+            🔊 Kuis Audio
+          </button>
+          <button id="btn-quiz-scramble" onclick="quizEngine.setMode('scramble')" class="quiz-mode-pill px-4 py-2 rounded-xl text-xs font-bold bg-[var(--card)] border border-[var(--border)] hover:border-red-500 transition shadow-sm">
+            🧩 Susun Kata
+          </button>
+          <button id="btn-quiz-write" onclick="quizEngine.setMode('write')" class="quiz-mode-pill px-4 py-2 rounded-xl text-xs font-bold bg-[var(--card)] border border-[var(--border)] hover:border-red-500 transition shadow-sm">
+            ✍️ Kuis Menulis
+          </button>
+          <button id="btn-quiz-speech" onclick="quizEngine.setMode('speech')" class="quiz-mode-pill px-4 py-2 rounded-xl text-xs font-bold bg-[var(--card)] border border-[var(--border)] hover:border-red-500 transition shadow-sm">
+            🎙️ Kuis Bicara
+          </button>
+        </div>
+
+        <!-- Main Quiz Card -->
+        <div class="max-w-xl mx-auto bg-[var(--card)] p-6 md:p-8 rounded-3xl border border-[var(--border)] shadow-sm space-y-6">
+          
+          <!-- Header Kuis: Skor & Nomor Soal -->
+          <div class="flex items-center justify-between pb-4 border-b border-[var(--border)] text-xs font-bold">
+            <span class="text-[var(--muted-foreground)]">Soal No: <strong class="text-[var(--foreground)]" id="quiz-question-num">1</strong></span>
+            <span class="text-emerald-500 font-black text-sm" id="quiz-score-display">Skor: 0</span>
+          </div>
+
+          <!-- Kuis Tipe 1 & 2: Pilihan Ganda & Audio -->
+          <div id="quiz-choice-view" class="space-y-6">
+            <div class="text-center py-4 space-y-3">
+              <span class="text-xs uppercase tracking-wider text-[var(--muted-foreground)] font-bold" id="quiz-audio-hint">
+                Pilih cara membaca karakter di atas:
+              </span>
+              <div class="w-28 h-28 mx-auto rounded-3xl bg-red-500/10 border-2 border-red-500/30 flex items-center justify-center text-6xl font-black text-red-500 shadow-sm" id="quiz-target-char">
+                あ
+              </div>
+              <button onclick="audioPlayer.play(quizEngine.currentQuestion.char)" class="text-xs text-red-500 font-bold hover:underline inline-flex items-center gap-1.5">
+                🔊 Putar Ulang Audio
+              </button>
+            </div>
+
+            <!-- Opsi Jawaban Dinamis -->
+            <div class="grid grid-cols-2 gap-3" id="quiz-options-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Kuis Tipe 3: Susun Kata (Scramble) -->
+          <div id="quiz-scramble-view" class="hidden space-y-6">
+            <div class="text-center py-2 space-y-2">
+              <span class="text-xs text-[var(--muted-foreground)] uppercase tracking-wider font-bold">Susun huruf berikut agar membentuk kata:</span>
+              <h3 class="text-xl font-black text-[var(--foreground)]" id="scramble-meaning">"Bunga Sakura"</h3>
+              <p class="text-xs text-red-500 font-bold" id="scramble-romaji">(sa - ku - ra)</p>
+            </div>
+
+            <!-- Slot Kata Terpilih -->
+            <div class="min-h-[60px] p-3 rounded-2xl bg-[var(--content)] border-2 border-dashed border-[var(--border)] flex items-center justify-center gap-2 flex-wrap" id="scramble-slots">
+              <!-- Rendered via JS -->
+            </div>
+
+            <!-- Pool Balok Huruf Acak -->
+            <div class="space-y-2">
+              <span class="text-xs text-[var(--muted-foreground)] font-semibold block text-center">Ketuk balok huruf untuk memilih:</span>
+              <div class="flex items-center justify-center gap-2 flex-wrap" id="scramble-pool">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+            <div class="flex justify-center gap-3 pt-2">
+              <button onclick="quizEngine.resetScramble()" class="px-4 py-2.5 rounded-xl border border-[var(--border)] text-xs font-bold hover:bg-[var(--content)] transition">
+                Ulang Susunan
+              </button>
+              <button onclick="quizEngine.checkScramble()" class="px-6 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-xs font-black transition shadow-sm">
+                Periksa Jawaban
+              </button>
+            </div>
+          </div>
+
+          <!-- Kuis Tipe 4: Latihan Menulis (Writing Quiz) -->
+          <div id="quiz-write-view" class="hidden space-y-6">
+            <div class="text-center py-2 space-y-2">
+              <span class="text-xs text-[var(--muted-foreground)] uppercase tracking-wider font-bold">
+                Tantangan Menulis Karakter dari Ingatan:
+              </span>
+              <div class="flex items-center justify-center gap-3">
+                <h3 class="text-3xl font-black text-red-500" id="quiz-write-target-romaji">"KA"</h3>
+                <button onclick="audioPlayer.play(quizEngine.currentWriteTarget.char)" class="p-2.5 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition text-xs font-bold" title="Dengarkan pelafalan">
+                  🔊 Putar Suara
+                </button>
+              </div>
+              <p class="text-xs text-[var(--muted-foreground)]" id="quiz-write-hint">
+                Petunjuk: 3 Goresan | Contoh: かさ (Payung)
+              </p>
+            </div>
+
+            <!-- Kanvas Menulis Kuis -->
+            <div class="flex flex-col items-center">
+              <div class="w-full max-w-[300px] flex items-center justify-between mb-2 text-xs">
+                <span class="text-[var(--muted-foreground)] font-semibold">Tulis di dalam kotak:</span>
+                <button onclick="quizEngine.toggleWritePeek()" id="btn-quiz-peek" class="text-xs font-bold text-red-500 hover:underline">
+                  👁️ Intip Bayangan
+                </button>
+              </div>
+
+              <div class="relative w-[300px] h-[300px] rounded-3xl border-2 border-dashed border-[var(--border)] overflow-hidden bg-[var(--content)] flex items-center justify-center kana-canvas-grid shadow-inner">
+                <!-- Guide yang tersembunyi secara default -->
+                <div id="quiz-canvas-guide-char" class="absolute select-none pointer-events-none text-gray-400/40 dark:text-gray-600/50 font-black text-[190px] leading-none opacity-0 transition-opacity duration-200">
+                  あ
+                </div>
+                <canvas id="quiz-drawing-canvas" width="300" height="300" class="absolute top-0 left-0 w-full h-full cursor-crosshair touch-none"></canvas>
+              </div>
+
+              <!-- Controls Kanvas Kuis -->
+              <div class="w-[300px] flex gap-2 mt-3">
+                <button onclick="quizEngine.quizCanvas.undo()" class="px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--content)] hover:bg-[var(--card)] text-xs font-bold transition">
+                  ↩️ Undo
+                </button>
+                <button onclick="quizEngine.quizCanvas.clear()" class="flex-1 py-2 rounded-xl border border-[var(--border)] bg-[var(--content)] hover:bg-[var(--card)] text-xs font-bold transition">
+                  🗑️ Hapus
+                </button>
+                <button onclick="quizEngine.revealWritingAnswer()" class="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-xs font-black transition shadow-sm">
+                  ✅ Buka Kunci Jawaban
+                </button>
+              </div>
+            </div>
+
+            <!-- Panel Kunci Jawaban & Urutan Goresan (Kakijun) -->
+            <div id="quiz-write-reveal-panel" class="hidden bg-[var(--content)] border border-[var(--border)] p-5 rounded-2xl space-y-4">
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-red-500 text-white flex items-center justify-center text-4xl font-black shadow-md" id="quiz-reveal-correct-char">
+                  か
+                </div>
+                <div class="space-y-1">
+                  <h4 class="text-sm font-bold text-[var(--foreground)]">Karakter yang Benar:</h4>
+                  <p class="text-xs text-[var(--muted-foreground)]" id="quiz-reveal-info">Huruf: か (ka) | 3 Goresan</p>
+                  <button onclick="audioPlayer.play(quizEngine.currentWriteTarget.char)" class="text-xs text-red-500 font-bold hover:underline inline-flex items-center gap-1">
+                    🔊 Dengarkan Lagi
+                  </button>
+                </div>
+              </div>
+
+              <!-- Cara Menulis yang Benar Step-by-Step -->
+              <div class="space-y-1.5 border-t border-[var(--border)] pt-3 text-xs">
+                <strong class="text-[var(--foreground)] block">Cara Menulis yang Benar (Kakijun):</strong>
+                <ol id="quiz-reveal-steps-list" class="list-decimal list-inside space-y-1 text-[var(--muted-foreground)] leading-relaxed">
+                  <!-- Rendered via JS -->
+                </ol>
+              </div>
+
+              <!-- Self Assessment Buttons -->
+              <div class="border-t border-[var(--border)] pt-3 space-y-2">
+                <span class="text-[11px] text-[var(--muted-foreground)] font-semibold block text-center">Bagaimana hasil goresan tulisanmu?</span>
+                <div class="flex gap-2">
+                  <button onclick="quizEngine.selfAssessWriting(true)" class="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition shadow-sm">
+                    ✅ Tulisan Saya Mirip (+15 Poin)
+                  </button>
+                  <button onclick="quizEngine.selfAssessWriting(false)" class="flex-1 py-2.5 rounded-xl bg-[var(--card)] border border-[var(--border)] text-xs font-bold hover:bg-[var(--content)] transition">
+                    🔄 Masih Belum Pas
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Kuis Tipe 5: Latihan Pelafalan Suara (Speech Recognition) -->
+          <div id="quiz-speech-view" class="hidden space-y-6">
+            <div class="text-center py-2 space-y-2">
+              <span class="text-xs text-[var(--muted-foreground)] uppercase tracking-wider font-bold">
+                Tantangan Pelafalan: Ucapkan Kata Ini ke Mikrofon:
+              </span>
+              <div class="py-2">
+                <h3 class="text-5xl font-black text-red-500 tracking-wide" id="quiz-speech-target-text">
+                  さくら
+                </h3>
+                <p class="text-sm font-bold text-[var(--foreground)] mt-1" id="quiz-speech-target-romaji">
+                  sa - ku - ra
+                </p>
+                <p class="text-xs text-[var(--muted-foreground)]" id="quiz-speech-target-meaning">
+                  "Bunga Sakura"
+                </p>
+              </div>
+
+              <!-- Tombol Contoh Pelafalan -->
+              <button onclick="quizEngine.playSpeechTargetAudio()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition text-xs font-bold shadow-sm">
+                🔊 Dengarkan Contoh Pelafalan
+              </button>
+            </div>
+
+            <!-- Area Interaksi Mikrofon -->
+            <div class="flex flex-col items-center justify-center p-6 bg-[var(--content)] rounded-3xl border border-[var(--border)] space-y-4">
+              
+              <!-- Tombol Mic Besar dengan Animasi Denyut -->
+              <button id="btn-speech-mic" onclick="quizEngine.toggleSpeechRecognition()" class="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center text-3xl shadow-xl transition-all duration-300">
+                🎙️
+              </button>
+
+              <div class="text-center space-y-1">
+                <span id="speech-status-text" class="text-xs font-bold text-[var(--foreground)] block">
+                  Ketuk tombol mic di atas lalu ucapkan kata tersebut!
+                </span>
+                <span class="text-[11px] text-[var(--muted-foreground)] block">
+                  Pastikan izin akses mikrofon diizinkan (Allow) oleh browser.
+                </span>
+              </div>
+
+              <!-- Live Transcript Result Box -->
+              <div id="speech-transcript-box" class="hidden w-full p-3.5 rounded-2xl bg-[var(--card)] border border-[var(--border)] text-xs text-center space-y-1">
+                <span class="text-[10px] uppercase font-bold text-[var(--muted-foreground)] block">Suaramu yang tertangkap:</span>
+                <div class="text-base font-black text-[var(--foreground)]" id="speech-transcript-result">
+                  ...
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Feedback Box & Tombol Lanjut -->
+          <div id="quiz-feedback-box" class="hidden p-4 rounded-2xl text-xs font-medium text-center space-y-3">
+            <div id="quiz-feedback-text"></div>
+            <button onclick="quizEngine.generateQuestion()" class="px-6 py-2.5 rounded-xl bg-[var(--foreground)] text-[var(--background)] font-black text-xs hover:opacity-90 transition inline-flex items-center gap-2">
+              Soal Selanjutnya ➔
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-[var(--border)] bg-[var(--card)] py-6 text-center text-xs text-[var(--muted-foreground)] mt-auto">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>KonnichiLearn &copy; 2026. Aplikasi Pembelajaran Bahasa Jepang.</p>
+      <p>Belajar Hiragana • Katakana • Kanji N5 • Percakapan Harian</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/drill.js"></script>
+  <script src="js/confusing.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
